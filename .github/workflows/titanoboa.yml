@@ -1,0 +1,15 @@
+- name: Titanoboa
+  id: titanoboa
+  uses: ublue-os/titanoboa@main
+  with:
+    image-ref: ghcr.io/sabrina-marino/project-amber
+    flatpaks-list: ${{ github.workspace }}/iso/flatpaks.list
+    hook-post-rootfs: ${{ github.workspace }}/iso/anaconda.sh
+    kargs: ""
+    builder-distro: almalinux
+
+- name: Rename and Checksum ISO
+  run: |
+    mkdir -p output
+    mv ${{ steps.build.outputs.iso-dest }} output/my-custom-image.iso
+    (cd output && sha256sum my-custom-image.iso | tee my-custom-image.iso-CHECKSUM)
