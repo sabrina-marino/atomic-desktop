@@ -8,11 +8,6 @@ set -xeuo pipefail
 # dnf install -y 'dnf-command(config-manager)'
 # dnf config-manager --set-enabled crb
 
-dnf copr enable sabbyblue/amber-branding -y
-# dnf remove almalinux-backgrounds -y
-dnf swap almalinux-logos amber-logos --nobest -y
-dnf copr disable sabbyblue/amber-branding -y
-
 
 dnf install distrobox fastfetch git restic buildah fzf fpaste glow gum hplip ntfs-3g ptyxis -y
 dnf install gwenview kweather kate kcalc kontact okular skanpage -y # haruna
