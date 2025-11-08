@@ -8,15 +8,6 @@ set -xeuo pipefail
 # dnf install -y 'dnf-command(config-manager)'
 # dnf config-manager --set-enabled crb
 
-# cp /ctx/system_files/fedora-logo.svg /usr/share/almalinux-logos
-# cp /ctx/system_files/fedora-logo-lightbackground.svg /usr/share/almalinux-logos
-# cp /ctx/system_files/fedora-logo-darkbackground.svg /usr/share/almalinux-logos
-#
-# cp /ctx/system_files/sidebar-bg.png /usr/share/anaconda/pixmaps
-# cp /ctx/system_files/sidebar-logo.png /usr/share/anaconda/pixmaps
-# cp /ctx/system_files/topbar-bg.png /usr/share/anaconda/pixmaps
-# cp /ctx/system_files/almalinux-day.jpg /usr/share/backgrounds
-# cp /ctx/system_files/almalinux-night.jpg /usr/share/backgrounds
 
 dnf install distrobox fastfetch git restic buildah fzf fpaste glow gum hplip ntfs-3g ptyxis -y
 dnf install gwenview kweather kate kcalc kontact okular skanpage -y # haruna
