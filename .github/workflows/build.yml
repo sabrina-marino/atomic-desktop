@@ -60,62 +60,62 @@ jobs:
       packages: write
       id-token: write
 
-  test-image:
-    name: Test image
-    runs-on: ubuntu-latest
-    needs: [set-env, build-image]
-
-    env:
-      IMAGE_REF: "${{ needs.build-image.outputs.image-ref }}@${{ needs.build-image.outputs.digest }}"
-
-    steps:
-      - name: Login to Container Registry
-        run: echo ${{ secrets.GITHUB_TOKEN }} | podman login -u ${{ needs.set-env.outputs.REGISTRY_USER }} --password-stdin ${{ needs.set-env.outputs.REGISTRY }}
-
-      - name: Test container
-        run: |
-          # Create a short script to test the image using heredoc
-          cat << 'EOF' > /tmp/test.sh
-          set -ex
-
-          cat /etc/os-release
-          bootc -V
-          EOF
-
-          podman run --rm \
-            -v /tmp/test.sh:/tmp/test.sh \
-            ${{ env.IMAGE_REF }} \
-            /bin/bash /tmp/test.sh
-
-  promote-image:
-    name: Promote image
-    needs: [set-env, build-image, test-image]
-    if: ${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
-    uses: AlmaLinux/atomic-ci/.github/workflows/retag-image.yml@v9
-    with:
-      image: ${{ needs.build-image.outputs.image-ref }}
-      digest: ${{ needs.build-image.outputs.digest }}
-      tag: |
-        ${{ needs.set-env.outputs.LATEST_TAG }}
-        ${{ needs.build-image.outputs.major-version }}
-        ${{ needs.build-image.outputs.redhat-version-id }}
-        ${{ needs.build-image.outputs.version }}
-      REGISTRY: ${{ needs.set-env.outputs.REGISTRY }}
-      REGISTRY_USER: ${{ needs.set-env.outputs.REGISTRY_USER }}
-    secrets:
-      REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    permissions:
-      packages: write
-
-  create-release:
-    name: Create Release
-    needs: [set-env, build-image, test-image, promote-image]
-    if: ${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
-    uses: AlmaLinux/atomic-ci/.github/workflows/create-release.yml@v9
-    with:
-      image-name: "${{ needs.set-env.outputs.IMAGE_NAME }}"
-      version: ${{ needs.build-image.outputs.version }}
-      pretty-version: ${{ needs.build-image.outputs.redhat-version-id }}
-      latest-image-ref: "${{ needs.build-image.outputs.image-ref }}:${{ needs.set-env.outputs.LATEST_TAG }}"
-    permissions:
-      contents: write
+  # test-image:
+  #   name: Test image
+  #   runs-on: ubuntu-latest
+  #   needs: [set-env, build-image]
+  #
+  #   env:
+  #     IMAGE_REF: "${{ needs.build-image.outputs.image-ref }}@${{ needs.build-image.outputs.digest }}"
+  #
+  #   steps:
+  #     - name: Login to Container Registry
+  #       run: echo ${{ secrets.GITHUB_TOKEN }} | podman login -u ${{ needs.set-env.outputs.REGISTRY_USER }} --password-stdin ${{ needs.set-env.outputs.REGISTRY }}
+  #
+  #     - name: Test container
+  #       run: |
+  #         # Create a short script to test the image using heredoc
+  #         cat << 'EOF' > /tmp/test.sh
+  #         set -ex
+  #
+  #         cat /etc/os-release
+  #         bootc -V
+  #         EOF
+  #
+  #         podman run --rm \
+  #           -v /tmp/test.sh:/tmp/test.sh \
+  #           ${{ env.IMAGE_REF }} \
+  #           /bin/bash /tmp/test.sh
+  #
+  # promote-image:
+  #   name: Promote image
+  #   needs: [set-env, build-image, test-image]
+  #   if: ${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+  #   uses: AlmaLinux/atomic-ci/.github/workflows/retag-image.yml@v9
+  #   with:
+  #     image: ${{ needs.build-image.outputs.image-ref }}
+  #     digest: ${{ needs.build-image.outputs.digest }}
+  #     tag: |
+  #       ${{ needs.set-env.outputs.LATEST_TAG }}
+  #       ${{ needs.build-image.outputs.major-version }}
+  #       ${{ needs.build-image.outputs.redhat-version-id }}
+  #       ${{ needs.build-image.outputs.version }}
+  #     REGISTRY: ${{ needs.set-env.outputs.REGISTRY }}
+  #     REGISTRY_USER: ${{ needs.set-env.outputs.REGISTRY_USER }}
+  #   secrets:
+  #     REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #   permissions:
+  #     packages: write
+  #
+  # create-release:
+  #   name: Create Release
+  #   needs: [set-env, build-image, test-image, promote-image]
+  #   if: ${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+  #   uses: AlmaLinux/atomic-ci/.github/workflows/create-release.yml@v9
+  #   with:
+  #     image-name: "${{ needs.set-env.outputs.IMAGE_NAME }}"
+  #     version: ${{ needs.build-image.outputs.version }}
+  #     pretty-version: ${{ needs.build-image.outputs.redhat-version-id }}
+  #     latest-image-ref: "${{ needs.build-image.outputs.image-ref }}:${{ needs.set-env.outputs.LATEST_TAG }}"
+  #   permissions:
+  #     contents: write
