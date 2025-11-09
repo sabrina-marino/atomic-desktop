@@ -9,6 +9,10 @@ set -xeuo pipefail
 # dnf config-manager --set-enabled crb
 
 
+rsync -rvK /ctx/system_files/ /
+
+
+
 dnf install fish distrobox fastfetch git restic buildah fzf fpaste glow gum hplip ntfs-3g ptyxis -y
 dnf install gwenview kweather kate kcalc kontact okular skanpage -y # haruna
 
